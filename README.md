@@ -1,4 +1,4 @@
-# heroku-docker-nginx-example
+# heroku-nginx-simple-app
 
 Barebones example of deploying
 [Super Lightweight Nginx Image](https://github.com/flashspys/docker-nginx-static)
