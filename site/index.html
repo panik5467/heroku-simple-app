@@ -1,0 +1,152 @@
+<body style="margin:4rem 6rem;width:50%">
+
+<div style="border:1px solid grey;padding-left: 1rem;">
+	<h3>
+	List of devices
+	</h3>
+	<pre id="devices">-- list of devices --</pre>
+</div>
+
+<div style="border:1px solid grey;padding-left: 1rem;">
+	<h3>
+	Properties of device
+	</h3>
+	<select id=selid onchange=getDetail(this.value)>
+	  <option></option>
+	</select>
+	<pre id=detail>
+	-- select a device --
+	</pre>
+	<p>
+	Set Charging Mode
+	</p>
+	<input id=mode type=text placeholder="charging mode" />
+	<button id=setMode >submit</button>
+
+	<p/>
+	<p>
+	Set Charging Time Window
+	</p>
+	<input id=time type=text placeholder="01:30:05:30:zone" />
+	<button id=setTime >submit</button>
+
+	<p/>
+</div>
+
+<div style="border:1px solid grey;padding-left: 1rem;">
+	<h3>
+	Telemetry Messages
+	</h3>
+	page: <input id=page type=text placeholder="1-1000" />
+	<button id=getTelemetry >get Telemetry</button>
+
+	<pre id=telemetry >-- telemetry messages --</pre>
+</div>
+
+<script src="https://code.jquery.com/jquery-1.12.4.min.js" ></script>
+<script>
+    $.get('/api/devices', function(data){
+
+		let array = [];
+		data.forEach( obj => array.push(`${obj.id}: ${obj.deviceId}`) );
+        $('#devices').text(array.join('\n'));
+
+        data.forEach((obj,id)=> $('#selid').append(('<option value="'+obj.deviceId+'">' +obj.deviceId + '</option>')))
+    });
+
+function getDetail(device) {
+
+    $.get('/api/device/'+device, function(data){
+		let array = [];
+		Object.keys(data).forEach(key => array.push(key + ': ' + JSON.stringify(data[key])));
+        $('#detail').text(array.join('\n'));
+		
+		let time = data.chargingTimeWindow;
+		let text = `${time.startHour}:${time.startMinutes}:${time.endHour}:${time.endMinutes}:${time.timezone}`;
+		
+		$('#time').val(text);
+		$('#mode').val(data.chargingMode);
+    });
+
+}
+
+$( "#setMode" ).click(function() {
+  setMode();
+});
+
+$( "#setTime" ).click(function() {
+  setTimeWindow();
+});
+
+$( "#getTelemetry" ).click(function() {
+  getTelemetry();
+});
+
+function setMode() {
+  let device = $('#selid').val();
+  let mode = $('#mode').val();
+  let url = '/api/chargingMode';
+  
+  if (mode == '')
+    alert("mode is mandatory");
+  else if (device == '')
+    alert("select a device");
+  else
+    
+	$.ajax({
+		type: 'PUT',
+		url: url + '/' + device,
+		contentType: 'application/json',
+		data: mode // access in body
+	}).done(function () {
+		console.log('SUCCESS');
+	}).fail(function (msg) {
+		console.log('FAIL');
+	});
+
+}
+
+function setTimeWindow() {
+  let device = $('#selid').val();
+  let time = $('#time').val();
+  let url = '/api/chargingTime';
+  
+  if (time == '')
+    alert("time is mandatory");
+  else if (device == '')
+    alert("select a device");
+  else
+    
+	$.ajax({
+		type: 'PUT',
+		url: url + '/' + device,
+		contentType: 'application/json',
+		data: time // access in body
+	}).done(function () {
+		console.log('SUCCESS');
+	}).fail(function (msg) {
+		console.log('FAIL');
+	});
+
+}
+
+function getTelemetry() {
+
+   let page = $('#page').val().trim();
+
+   let num = (page.match("^\\d+$")) ? parseInt(page, 10) : 1;
+   num = (num > 0) ? num : 1;
+
+    $.get('/api/telemetry/ESP/' + num, function(data){
+		let array = [];
+		//data.forEach(obj => array.push(JSON.stringify(obj)));
+		data.forEach( obj => array.push(`${obj.id}: ${obj.deviceId} - ${obj.createDate.substring(0,19)} | ${obj.batteryLevel} `) );
+        $('#telemetry').text(array.join('\n'));
+    });
+
+
+}
+
+
+</script>
+</body>

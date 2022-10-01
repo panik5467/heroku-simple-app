@@ -1,0 +1,8 @@
+{
+  "name": "heroku-simple-app",
+  "description": "Super Lightweight Nginx Image",
+  "repository": "https://github.com/panik5467/heroku-simple-app",
+  "logo": "https://upload.wikimedia.org/wikipedia/commons/c/c5/Nginx_logo.svg",
+  "keywords": ["nginx", "docker", "static"],
+  "stack": "container"
+}
