@@ -62,10 +62,12 @@ function getDetail(device) {
         $('#detail').text(array.join('\n'));
 		
 		let time = data.chargingTimeWindow;
-		let text = `${time.startHour}:${time.startMinutes}:${time.endHour}:${time.endMinutes}:${time.timezone}`;
+		time = (time != 'null') ? `${time.startHour}:${time.startMinutes}:${time.endHour}:${time.endMinutes}:${time.timezone}` : "";
+		let mode = data.chargingMode.replaceAll("null","");
 		
-		$('#time').val(text);
-		$('#mode').val(data.chargingMode);
+		$('#time').val(time);
+		$('#mode').val(mode);
+
     });
 
 }
